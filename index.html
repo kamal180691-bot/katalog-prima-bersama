@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KATALOG PRIMA BERSAMA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f4f6f9;
+      color: #1f2937;
+      padding: 24px;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+    header {
+      background: #111827;
+      color: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    header h1 {
+      font-size: 24px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    header p {
+      font-size: 13px;
+      color: #d1d5db;
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    input, select {
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      background: #fff;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand {
+      font-size: 11px;
+      font-weight: 700;
+      color: #2563eb;
+      text-transform: uppercase;
+    }
+    .title {
+      font-size: 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .meta {
+      font-size: 12px;
+      color: #4b5563;
+      line-height: 1.6;
+      text-transform: uppercase;
+    }
+    .price {
+      font-size: 15px;
+      font-weight: 800;
+      color: #111827;
+    }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button {
+      flex: 1;
+      padding: 9px 10px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .btn-wa { background: #16a34a; color: #fff; }
+    .btn-copy { background: #e5e7eb; color: #111827; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>PRIMA BERSAMA</h1>
+      <p>KATALOG PRODUK GROSIR &amp; STOK TERSEDIA</p>
+    </header>
+
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="CARI KODE / NAMA PRODUK..." oninput="renderCatalog()" />
+      <select id="brandFilter" onchange="renderCatalog()">
+        <option value="">SEMUA MEREK</option>
+      </select>
+    </div>
+
+    <div class="grid" id="catalogGrid"></div>
+  </div>
+
+  <script>
+    // Ganti atau sambungkan data ini dengan Google Apps Script / Google Sheets Anda
+    const PRODUCTS = [
+      {
+        kode: "PB-001",
+        merek: "PORTO",
+        nama: "SANDAL JAPIT PORTO",
+        kemasan: "1 LUSIN / 12 PASANG",
+        ukuran: "38 - 43",
+        harga: "RP 180.000 / LUSIN",
+        stok: "TERSEDIA"
+      },
+      {
+        kode: "PB-002",
+        merek: "DULUX",
+        nama: "SANDAL SLOP DULUX",
+        kemasan: "1 LUSIN / 12 PASANG",
+        ukuran: "39 - 44",
+        harga: "RP 195.000 / LUSIN",
+        stok: "TERSEDIA"
+      }
+    ];
+
+    function populateBrands() {
+      const select = document.getElementById("brandFilter");
+      const brands = [...new Set(PRODUCTS.map(p => p.merek.toUpperCase()))];
+      brands.forEach(b => {
+        const opt = document.createElement("option");
+        opt.value = b;
+        opt.textContent = b;
+        select.appendChild(opt);
+      });
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("TEKS DISALIN:\n\n" + text);
+      });
+    }
+
+    function renderCatalog() {
+      const q = document.getElementById("searchInput").value.toUpperCase();
+      const brand = document.getElementById("brandFilter").value.toUpperCase();
+      const grid = document.getElementById("catalogGrid");
+
+      const filtered = PRODUCTS.filter(p => {
+        const matchText =
+          p.kode.toUpperCase().includes(q) ||
+          p.nama.toUpperCase().includes(q) ||
+          p.merek.toUpperCase().includes(q);
+        const matchBrand = !brand || p.merek.toUpperCase() === brand;
+        return matchText && matchBrand;
+      });
+
+      grid.innerHTML = filtered.map(p => {
+        const tagText =
+          `PRIMA BERSAMA\n` +
+          `KODE: ${p.kode}\n` +
+          `MEREK: ${p.merek}\n` +
+          `PRODUK: ${p.nama}\n` +
+          `KEMASAN: ${p.kemasan}\n` +
+          `UKURAN: ${p.ukuran}\n` +
+          `HARGA: ${p.harga}\n` +
+          `STOK: ${p.stok}`;
+
+        return `
+          <div class="card">
+            <div>
+              <div class="brand">${p.merek} • ${p.kode}</div>
+              <div class="title">${p.nama}</div>
+              <div class="meta" style="margin-top:8px;">
+                KEMASAN: ${p.kemasan}<br/>
+                UKURAN: ${p.ukuran}<br/>
+                STOK: ${p.stok}
+              </div>
+            </div>
+            <div>
+              <div class="price" style="margin-bottom:10px;">${p.harga}</div>
+              <div class="btn-group">
+                <button class="btn-copy" onclick="copyText(${JSON.stringify(tagText)})">SALIN TEKS WA</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    populateBrands();
+    renderCatalog();
+  </script>
+</body>
+</html>
